@@ -6,18 +6,33 @@ const jogadorAtual = document.querySelector("aside div")
 
 let posicoesVermelho = [];
 let posicoesPreto = [];
+let pontosVermelho=0
+let pontosPreto=0
 
 function criarTabuleiro() {
+
     let idCount = 0
-    for(let i=0; i<7;i++){
+
+    for (let i = 0; i < 7; i++) {
+
         let coluna = document.createElement('div')
+
         coluna.classList.add('coluna')
+        coluna.addEventListener("click", () => {
+            identificarLivre(coluna);
+        });
+
         $main.appendChild(coluna)
-        for(let y=0; y< 6; y++){
-            let space=document.createElement('div')
+
+        for (let y = 0; y < 6; y++) {
+
+            let space = document.createElement('div')
+
             space.classList.add('espaco')
             space.id = `space${idCount}`
+
             coluna.appendChild(space)
+
             idCount++
         }
     }
@@ -26,8 +41,6 @@ function criarTabuleiro() {
 criarTabuleiro();
 
 function controleJogador() {
-
-    //identifica jogador atual
     let copiaJogador = document.querySelector("aside div")
     if(copiaJogador.classList[1]==="vermelho"){
         copiaJogador.classList.remove("vermelho")
@@ -36,25 +49,49 @@ function controleJogador() {
         copiaJogador.classList.remove("preto")
         copiaJogador.classList.add("vermelho")
     }
-    //muda classe para a próxima cor
 
 }
 
 function notificarVitoria(cor) {
-
-    const colunas = document.querySelectorAll(".coluna")
-    for(let i=0;i<colunas.length;i++){
-        colunas[i].classList.add("hidden")
-    }
+    
+    
+    $main.innerText=""
     let notificação = document.createElement("p")
+    notificação.classList.add("fadeIn")
     if(cor==="empate"){
         notificação.innerText="EMPATE"
-    }else{
+    }else if(cor==="vermelho"){
+        pontosVermelho++
+        contadorVitória(cor, pontosVermelho)
+        notificação.innerText=`JOGADOR: ${cor.toUpperCase()} GANHOU`
+    }
+    else if(cor==="preto"){
+        pontosPreto++
+        contadorVitória(cor, pontosPreto)
         notificação.innerText=`JOGADOR: ${cor.toUpperCase()} GANHOU`
     }
     $main.appendChild(notificação)
-
+    const $body = document.querySelector("body")
+    const btnRestart = document.createElement("button")
+    btnRestart.classList.add("restart")
+    btnRestart.innerText="Restart"
+    $body.appendChild(btnRestart)
+    btnRestart.addEventListener("click", Restart)
 }
+function contadorVitória(cor, pontos){
+    const pontosjogador = document.querySelector(`.pontos_${cor}`)
+    pontosjogador.innerText=pontos
+}
+
+function Restart(){
+    document.querySelector("button").remove()
+    posicoesVermelho = [];
+    posicoesPreto = [];
+    $main.innerText=""
+    controleJogador()
+    criarTabuleiro()
+}
+
 
 function verficiarVencedor(cor, posicoes) {
     let posicoesJogador;
@@ -71,13 +108,11 @@ function verficiarVencedor(cor, posicoes) {
         if (posicoesJogador.includes(posicoesJogador[i] + 1)
             && posicoesJogador.includes(posicoesJogador[i] + 2)
             && posicoesJogador.includes(posicoesJogador[i] + 3)) {
-
             notificarVitoria(cor)
             break
         } else if (posicoesJogador.includes(posicoesJogador[i] + 5)
             && posicoesJogador.includes(posicoesJogador[i] + 10)
             && posicoesJogador.includes(posicoesJogador[i] + 15)) {
-
             notificarVitoria(cor)
             break
         } else if (posicoesJogador.includes(posicoesJogador[i] + 6)
@@ -89,7 +124,6 @@ function verficiarVencedor(cor, posicoes) {
         } else if (posicoesJogador.includes(posicoesJogador[i] + 7)
             && posicoesJogador.includes(posicoesJogador[i] + 14)
             && posicoesJogador.includes(posicoesJogador[i] + 21)) {
-
             notificarVitoria(cor)
          } 
     }
@@ -101,28 +135,19 @@ function verficiarVencedor(cor, posicoes) {
 
 function atualizarArray(id, cor) {
 
-    //identificar jogador atual
+
+
     if(cor==="vermelho"){
         posicoesVermelho.push(parseInt(id.substr(5)))
     }
     if(cor==="preto"){
-
         posicoesPreto.push(parseInt(id.substr(5)))
-    
     }
     if(posicoesVermelho.length>=4){
         verficiarVencedor("vermelho", posicoesVermelho)
-        
-       
     }if(posicoesPreto.length>=4 && posicoesPreto.length<21){
         verficiarVencedor("preto", posicoesPreto)
-        
     }
-    //adicionar id ao array correspondente ao jogador
-
-     
-    // verificarEmpate()
-
 }
 
 function adicionarDisco(id) {
@@ -168,8 +193,38 @@ function identificarLivre(colunaClicada) {
 
 }
 
-for (let i = 0; i < $main.children.length; i++) {
-    $main.children[i].addEventListener("click", () => {
-        identificarLivre($main.children[i]);
-    });
+function criaJogadores(){
+    const $body = document.querySelector("body")
+    const jogadores = document.createElement("div")
+    const jogadorVermelho= document.createElement("div")
+    const jogadorPreto= document.createElement("div")
+    const jV = document.createElement("div")
+    const jP = document.createElement("div")
+    const textV = document.createElement("p")
+    const textP = document.createElement("p")
+
+
+    jogadores.classList.add("container_jogadores")
+    jogadorVermelho.classList.add("jodador")
+    jogadorPreto.classList.add("jodador")
+    jV.classList.add("vermelho")
+    jV.classList.add("disco2")
+    jP.classList.add("preto")
+    jP.classList.add("disco2")
+    textV.classList.add("pontos_vermelho")
+    textP.classList.add("pontos_preto")
+
+    jogadorVermelho.innerText="Jogador"
+    jogadorPreto.innerText="Jogador"
+    textP.innerText="0"
+    textV.innerText="0"
+
+    $body.appendChild(jogadores)
+    jogadores.appendChild(jogadorVermelho)
+    jogadores.appendChild(jogadorPreto)
+    jogadorVermelho.appendChild(jV)
+    jogadorPreto.appendChild(jP)
+    jogadorVermelho.appendChild(textV)
+    jogadorPreto.appendChild(textP)
 }
+criaJogadores()
