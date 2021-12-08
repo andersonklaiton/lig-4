@@ -12,6 +12,7 @@ let pontosPreto = 0
 function criarTabuleiro() {
 
     let idCount = 0
+    //
 
     for (let i = 0; i < 7; i++) {
 
